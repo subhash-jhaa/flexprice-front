@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { FC, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 // Types and Interfaces
 interface BaseColumnData<T> {
@@ -39,6 +40,8 @@ export interface FlexpriceTableProps<T> {
 	variant?: 'default' | 'no-bordered';
 	/** Applied to the inner `<table>` (e.g. `table-fixed` for predictable column widths). */
 	tableClassName?: string;
+	virtualized?: boolean;
+	containerHeight?: string | number;
 }
 
 // Helper Functions
@@ -57,11 +60,13 @@ const isInteractiveElement = (element: HTMLElement | null): boolean => {
 };
 
 // Table structure components
-const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(({ className, ...props }, ref) => (
-	<div className='relative w-full overflow-auto'>
-		<table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
-	</div>
-));
+const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement> & { containerRef?: React.Ref<HTMLDivElement> }>(
+	({ className, containerRef, ...props }, ref) => (
+		<div ref={containerRef} className='relative w-full overflow-auto h-full'>
+			<table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+		</div>
+	),
+);
 Table.displayName = 'Table';
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
@@ -160,7 +165,17 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({
 	hideBottomBorder = true,
 	variant = 'default',
 	tableClassName,
+	virtualized,
+	containerHeight = 400,
 }) => {
+	const parentRef = React.useRef<HTMLDivElement>(null);
+
+	const rowVirtualizer = useVirtualizer({
+		count: data.length,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => 36,
+		overscan: 10,
+	});
 	const handleRowClick = (row: any, e: React.MouseEvent) => {
 		const target = e.target as HTMLElement;
 
@@ -216,11 +231,12 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({
 		</TableHeader>
 	);
 
-	const renderTableRow = (row: any, rowIndex: number) => {
+	const renderTableRow = (row: any, rowIndex: number, measureRef?: (node: Element | null) => void) => {
 		const lastRow = rowIndex === data.length - 1;
 
 		return (
 			<TableRow
+				ref={measureRef}
 				onClick={(e) => handleRowClick(row, e)}
 				className={cn(
 					'transition-colors hover:bg-muted/50',
@@ -286,20 +302,50 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({
 		);
 	};
 
+	const renderBodyContent = () => {
+		if (data.length === 0) return renderEmptyRow();
+
+		if (!virtualized) {
+			return data.map((row, rowIndex) => renderTableRow(row, rowIndex));
+		}
+
+		const virtualRows = rowVirtualizer.getVirtualItems();
+		const paddingTop = virtualRows.length > 0 ? virtualRows[0]?.start || 0 : 0;
+		const paddingBottom = virtualRows.length > 0 ? rowVirtualizer.getTotalSize() - (virtualRows[virtualRows.length - 1]?.end || 0) : 0;
+
+		return (
+			<>
+				{paddingTop > 0 && (
+					<tr>
+						<td style={{ height: `${paddingTop}px` }} />
+					</tr>
+				)}
+				{virtualRows.map((virtualRow) => {
+					const row = data[virtualRow.index];
+					return renderTableRow(row, virtualRow.index, rowVirtualizer.measureElement);
+				})}
+				{paddingBottom > 0 && (
+					<tr>
+						<td style={{ height: `${paddingBottom}px` }} />
+					</tr>
+				)}
+			</>
+		);
+	};
+
 	return (
 		<div
+			style={virtualized ? { height: containerHeight } : undefined}
 			className={cn(
+				virtualized ? 'flex flex-col' : '',
 				'overflow-hidden',
 				variant === 'default' && 'rounded-[6px] border border-[#E2E8F0]',
 				variant === 'default' && !hideBottomBorder && 'border-b border-[#E2E8F0]',
 				variant === 'no-bordered' && 'border-0',
 			)}>
-			<Table className={tableClassName}>
+			<Table containerRef={parentRef} className={tableClassName}>
 				{renderTableHeader()}
-				<TableBody>
-					{data.map((row, rowIndex) => renderTableRow(row, rowIndex))}
-					{renderEmptyRow()}
-				</TableBody>
+				<TableBody>{renderBodyContent()}</TableBody>
 			</Table>
 		</div>
 	);

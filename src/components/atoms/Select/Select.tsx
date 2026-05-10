@@ -13,7 +13,7 @@ export interface SelectOption {
 	disabled?: boolean;
 }
 
-interface Props {
+export interface Props {
 	options: SelectOption[];
 	value?: string;
 	defaultOpen?: boolean;

@@ -33,10 +33,23 @@ const buttonVariants = cva(
 		},
 	},
 );
+/**
+ * Button component for user interactions.
+ * Supports various variants, sizes, and states like loading and disabled.
+ *
+ * @example
+ * <Button variant="primary" size="md" onClick={() => console.log('Clicked')}>
+ *   Click Me
+ * </Button>
+ */
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+	/** Whether the button should be rendered as a child component (using Radix Slot) */
 	asChild?: boolean;
+	/** Whether the button is in a loading state */
 	isLoading?: boolean;
+	/** Icon to be displayed after the button text */
 	suffixIcon?: ReactNode;
+	/** Icon to be displayed before the button text */
 	prefixIcon?: ReactNode;
 }
 

@@ -12,7 +12,7 @@ import {
 	type DateTimezone,
 } from '@/utils/common/format_date';
 
-interface Props {
+export interface Props {
 	startDate?: Date;
 	endDate?: Date;
 	placeholder?: string;

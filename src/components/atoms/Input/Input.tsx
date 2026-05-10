@@ -69,21 +69,43 @@ const getInputPattern = (variant: InputVariant, options: NumberFormatOptions = D
 	}
 };
 
-interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size'> {
+/**
+ * Input component for text and number entry.
+ * Supports various variants like formatted-number, integer, and standard text.
+ *
+ * @example
+ * <Input label="Amount" variant="formatted-number" onChange={(val) => console.log(val)} />
+ */
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size'> {
+	/** Label text for the input */
 	label?: string;
+	/** Description text below the input */
 	description?: React.ReactNode;
+	/** Error message to display below the input */
 	error?: string;
+	/** Standard HTML input type */
 	type?: React.HTMLInputTypeAttribute;
+	/** Change handler that receives the raw value */
 	onChange?: (value: string) => void;
+	/** Whether the input is disabled */
 	disabled?: boolean;
+	/** Element to display after the input (e.g. icon or unit) */
 	suffix?: React.ReactNode;
+	/** Additional CSS classes */
 	className?: string;
+	/** Placeholder text */
 	placeholder?: string;
+	/** Unique ID for the input */
 	id?: string;
+	/** Element to display before the input (e.g. currency symbol) */
 	inputPrefix?: React.ReactNode;
+	/** Additional CSS classes for the label */
 	labelClassName?: string;
+	/** Input variant for special behavior (formatting) */
 	variant?: InputVariant;
+	/** Options for number formatting */
 	formatOptions?: NumberFormatOptions;
+	/** Size variant */
 	size?: SizeVariant;
 }
 
