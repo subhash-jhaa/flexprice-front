@@ -21,7 +21,7 @@ export interface CardItem {
 	onClick?: () => void;
 }
 
-interface Props {
+export interface Props {
 	onAddClick?: () => void;
 	tags?: string[];
 	heading?: string;

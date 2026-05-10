@@ -2,12 +2,24 @@ import { formatNumber } from '@/utils/common';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-interface MetricCardProps {
+/**
+ * MetricCard displays a KPI metric with a title, value, and optional trend indicator.
+ *
+ * @example
+ * <MetricCard title="Revenue" value={1250.50} currency="USD" showChangeIndicator />
+ */
+export interface MetricCardProps {
+	/** Title of the metric */
 	title: string;
+	/** Numerical value of the metric */
 	value: number;
+	/** Optional currency code to display with the value */
 	currency?: string;
+	/** Whether the value should be displayed as a percentage */
 	isPercent?: boolean;
+	/** Whether to show a trend indicator (up/down arrow) */
 	showChangeIndicator?: boolean;
+	/** Whether the trend is negative (red down arrow) or positive (green up arrow) */
 	isNegative?: boolean;
 }
 

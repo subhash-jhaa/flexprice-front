@@ -45,7 +45,7 @@ const PLAN_CHARGES_PAGE_SIZE = 10;
 
 // ===== TYPES & CONSTANTS =====
 
-interface PlanChargesTableProps {
+export interface PlanChargesTableProps {
 	plan: Plan;
 	onPriceUpdate?: () => void;
 }
