@@ -84,6 +84,14 @@ export const Virtualized: Story = {
 };
 
 const FilterDemo = () => {
+	return (
+		<MemoryRouter initialEntries={['/']}>
+			<FilterContent />
+		</MemoryRouter>
+	);
+};
+
+const FilterContent = () => {
 	const { filters, setFilter, resetFilters } = useFilterStore('demo-users');
 
 	const filteredData = DATA.filter((row) => {
@@ -97,42 +105,40 @@ const FilterDemo = () => {
 	});
 
 	return (
-		<MemoryRouter initialEntries={['/']}>
-			<div className='space-y-6 max-w-3xl w-full mx-auto p-4'>
-				<div className='flex gap-4 items-end'>
-					<div className='flex-1'>
-						<Input
-							label='Search Customers'
-							placeholder='Type a name…'
-							value={(filters.search as string) || ''}
-							onChange={(value) => setFilter('search', value)}
-						/>
-					</div>
-					<div className='flex-1'>
-						<Input
-							label='Filter by Status'
-							placeholder='e.g. paid'
-							value={(filters.status as string) || ''}
-							onChange={(value) => setFilter('status', value)}
-						/>
-					</div>
-					<Button variant='outline' onClick={resetFilters}>
-						Clear Filters
-					</Button>
+		<div className='space-y-6 max-w-3xl w-full mx-auto p-4'>
+			<div className='flex gap-4 items-end'>
+				<div className='flex-1'>
+					<Input
+						label='Search Customers'
+						placeholder='Type a name…'
+						value={(filters.search as string) || ''}
+						onChange={(value) => setFilter('search', value)}
+					/>
 				</div>
-
-				<div className='text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg border border-border'>
-					<p>
-						<strong className='text-foreground'>Active Filters in sessionStorage:</strong> {JSON.stringify(filters)}
-					</p>
-					<p className='mt-2 text-xs'>
-						* Notice how only a lightweight fingerprint (e.g., <code>?f=1</code>) is synced to the URL rather than the raw JSON.
-					</p>
+				<div className='flex-1'>
+					<Input
+						label='Filter by Status'
+						placeholder='e.g. paid'
+						value={(filters.status as string) || ''}
+						onChange={(value) => setFilter('status', value)}
+					/>
 				</div>
-
-				<FlexpriceTable columns={COLUMNS} data={filteredData} showEmptyRow />
+				<Button variant='outline' onClick={resetFilters}>
+					Clear Filters
+				</Button>
 			</div>
-		</MemoryRouter>
+
+			<div className='text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg border border-border'>
+				<p>
+					<strong className='text-foreground'>Active Filters in sessionStorage:</strong> {JSON.stringify(filters)}
+				</p>
+				<p className='mt-2 text-xs'>
+					* Notice how only a lightweight fingerprint (e.g., ?f=1) is synced to the URL rather than the raw JSON.
+				</p>
+			</div>
+
+			<FlexpriceTable columns={COLUMNS} data={filteredData} showEmptyRow />
+		</div>
 	);
 };
 
